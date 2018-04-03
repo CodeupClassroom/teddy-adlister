@@ -1,4 +1,7 @@
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.mysql.cj.jdbc.Driver;
 
 public class MySQLDemo {
@@ -26,7 +29,10 @@ public class MySQLDemo {
     }
 
     /**
-     * 1. Employees example
+     * 1. Employees query example
+     * 2. Employee Model
+     * 3. instead of sout, create a List of Employees
+     * 4. Hide passwords
      */
     public static void main(String[] args) {
 
@@ -46,7 +52,11 @@ public class MySQLDemo {
 
             System.out.println("\n--- employeesExample ---\n");
 
-            employeesExample();
+            // call this pass the results to jsp
+            // in the jsp loop through and create html
+            for(Employee emp : employeesExample()) {
+                System.out.printf("emp_no: %s - name: %s, %s\n", emp.getEmpNo(), emp.getLastName(), emp.getFirstName());
+            }
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -55,16 +65,26 @@ public class MySQLDemo {
 
     }
 
-    private static void employeesExample() throws SQLException {
+    private static List<Employee> employeesExample() throws SQLException {
+        // 1. Create an empty list
+        List<Employee> employees = new ArrayList<>();
 
+        // 2. Run a query
         Statement stmt = connection.createStatement();
-        System.out.println(stmt);
-
         ResultSet rs = stmt.executeQuery("SELECT * FROM employees LIMIT 10");
-        System.out.println(rs);
 
+        // 3. loop through the query results
+        //    queryresult -> employee object
         while( rs.next() ){
-            
+            // 4. Create an employee object and add it to the list
+            Employee employee = new Employee();
+            employee.setEmpNo(rs.getString("emp_no"));
+            employee.setFirstName(rs.getString("first_name"));
+            employee.setLastName(rs.getString("last_name"));
+            // 5. Set the properties based on the query results
+            employees.add(employee);
         }
+
+        return employees;
     }
 }
